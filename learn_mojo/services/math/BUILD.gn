@@ -1,0 +1,11 @@
+source_set("math") {
+  sources = [
+    "math_service.cc",
+    "math_service.h",
+  ]
+
+  deps = [
+    "public/mojom",
+    "//base",
+  ]
+}

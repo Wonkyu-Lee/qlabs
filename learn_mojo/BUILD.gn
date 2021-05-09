@@ -1,0 +1,43 @@
+group("learn_mojo") {
+  deps = [
+    ":mojo_multi",
+    ":mojo_single",
+  ]
+}
+
+executable("mojo_multi") {
+  sources = [ "parent_main.cc" ]
+
+  deps = [
+    ":mojo_child",
+    "services/math",
+    "//base",
+    "//mojo/core/embedder",
+    "//mojo/public/cpp/platform",
+    "//mojo/public/cpp/system",
+  ]
+}
+
+executable("mojo_child") {
+  sources = [ "child_main.cc" ]
+
+  deps = [
+    "services/math",
+    "//base",
+    "//mojo/core/embedder",
+    "//mojo/public/cpp/platform",
+    "//mojo/public/cpp/system",
+  ]
+}
+
+executable("mojo_single") {
+  sources = [ "single_main.cc" ]
+
+  deps = [
+    "services/math",
+    "//base",
+    "//mojo/core/embedder",
+    "//mojo/public/cpp/platform",
+    "//mojo/public/cpp/system",
+  ]
+}
