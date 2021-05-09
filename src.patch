@@ -1,0 +1,23 @@
+diff --git a/.gitignore b/.gitignore
+index 31867d1..9d7eacd 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -329,3 +329,6 @@ vs-chromium-project.txt
+ 
+ # Ignore the default results output directory for tools/run-swarmed.py
+ /results
++
++# Ignore qlabs
++/qlabs
+diff --git a/BUILD.gn b/BUILD.gn
+index faaf6c5..50e3c89 100644
+--- a/BUILD.gn
++++ b/BUILD.gn
+@@ -1452,3 +1452,7 @@ _lines = [
+ assert(current_toolchain == default_toolchain)
+ 
+ write_file("$root_build_dir/gn_logs.txt", _lines)
++
++group("qlabs_all") {
++  deps = [ "//qlabs" ]
++}
