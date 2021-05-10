@@ -4,8 +4,10 @@
 #include "base/task/thread_pool/thread_pool_instance.h"
 #include "base/threading/thread.h"
 #include "mojo/core/embedder/embedder.h"
+#include "mojo/public/cpp/bindings/pending_remote.h"
 #include "mojo/public/cpp/bindings/remote.h"
 #include "qlabs/learn_mojo/services/math/math_service.h"
+#include "qlabs/learn_mojo/services/math/public/mojom/math_service.mojom.h"
 
 base::RepeatingClosure g_quit_closure;
 
@@ -26,9 +28,20 @@ int main(int argc, char** argv) {
   base::RunLoop loop;
   g_quit_closure = loop.QuitClosure();
 
+#if 0
+  mojo::MessagePipe pipe;
+  auto pending_remote =
+      mojo::PendingRemote<math::mojom::MathService>(std::move(pipe.handle0), 0);
+  auto pending_receiver =
+      mojo::PendingReceiver<math::mojom::MathService>(std::move(pipe.handle1));
+  mojo::Remote<math::mojom::MathService> math_service(
+      std::move(pending_remote));
+  math::MathService math_service_impl(std::move(pending_receiver));
+#else
   mojo::Remote<math::mojom::MathService> math_service;
   math::MathService math_service_impl(
       math_service.BindNewPipeAndPassReceiver());
+#endif
 
   // Call math::mojom::MathService::Divide()
   LOG(INFO) << "Call math::mojom::MathService::Divide(42, 6)";
