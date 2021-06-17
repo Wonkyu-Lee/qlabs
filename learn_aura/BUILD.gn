@@ -1,0 +1,35 @@
+import("//build/config/ui.gni")
+import("//testing/test.gni")
+
+executable("learn_aura") {
+  testonly = true
+
+  sources = [ "main.cc" ]
+
+  deps = [
+    "//base",
+    "//base:i18n",
+    "//build/win:default_exe_manifest",
+    "//components/viz/host",
+    "//components/viz/service",
+    "//mojo/core/embedder",
+    "//skia",
+    "//third_party/icu",
+    "//ui/aura",
+    "//ui/aura:test_support",
+    "//ui/base",
+    "//ui/base/ime/init",
+    "//ui/compositor",
+    "//ui/compositor:test_support",
+    "//ui/display",
+    "//ui/events",
+    "//ui/gfx",
+    "//ui/gfx/geometry",
+    "//ui/gl",
+    "//ui/gl/init",
+  ]
+
+  if (use_x11) {
+    deps += [ "//ui/gfx/x" ]
+  }
+}
