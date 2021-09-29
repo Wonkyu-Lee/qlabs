@@ -1,0 +1,15 @@
+group("learn_basic") {
+  deps = [
+    ":sample_hello",
+    ":sample_string",
+  ]
+}
+
+executable("sample_hello") {
+  sources = [ "hello_main.cc" ]
+}
+
+executable("sample_string") {
+  sources = [ "string_main.cc" ]
+  deps = [ "//base" ]
+}
