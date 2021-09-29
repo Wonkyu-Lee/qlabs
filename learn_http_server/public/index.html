@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>Insert title here</title>
+</head>
+
+<body>
+  <h3>WebSocket Test</h3>
+  <form>
+    <input id="textMessage" type="text">
+    <input onclick="sendMessage()" value="Send" type="button">
+    <input onclick="disconnect()" value="Disconnect" type="button">
+  </form>
+  <br>
+  <textarea id="messageTextArea" rows="10" cols="50"></textarea>
+  <script type="text/javascript">
+    var webSocket = new WebSocket("ws://localhost:3101/whaleauto/api");
+    var messageTextArea = document.getElementById("messageTextArea");
+    webSocket.onopen = function (message) {
+      messageTextArea.value += "Server connect...\n";
+    };
+    webSocket.onclose = function (message) {
+      messageTextArea.value += "Server Disconnect...\n";
+    };
+    webSocket.onerror = function (message) {
+      messageTextArea.value += "error...\n";
+    };
+    webSocket.onmessage = function (message) {
+      messageTextArea.value += "Recieve From Server => " + message.data + "\n";
+    };
+    function sendMessage() {
+      var message = document.getElementById("textMessage");
+      messageTextArea.value += "Send to Server => " + message.value + "\n";
+      webSocket.send(message.value);
+      message.value = "";
+    }
+    function disconnect() {
+      webSocket.close();
+    }
+  </script>
+
+  <h3>JS Module Test</h3>
+  <textarea id="textArea" rows="10" cols="50"></textarea><br>
+  <input type="text" id="a" size="3">
+  <input type="button" id="buttonAdd" value="+">
+  <input type="text" id="b" size="3">
+  <script type="module">
+    import { add } from './modules/calculator.js'
+    function showModuleResult() {
+      var textArea = document.getElementById("textArea");
+      var a = document.getElementById("a");
+      var b = document.getElementById("b");
+      textArea.value += `add(${a.value}, ${b.value}) = ${add(Number(a.value), Number(b.value))}\n`
+    }
+    document.getElementById("buttonAdd").onclick = showModuleResult;
+  </script>
+</body>
+
+</html>

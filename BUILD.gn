@@ -1,6 +1,7 @@
 group("qlabs") {
   deps = [
     "learn_basic",
+    "learn_http_server",
     "learn_mojo",
   ]
 }
