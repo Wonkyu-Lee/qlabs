@@ -1,15 +1,21 @@
 group("learn_basic") {
   deps = [
-    ":sample_hello",
-    ":sample_string",
+    ":learn_command_line",
+    ":learn_hello",
+    ":learn_string",
   ]
 }
 
-executable("sample_hello") {
+executable("learn_hello") {
   sources = [ "hello_main.cc" ]
 }
 
-executable("sample_string") {
+executable("learn_string") {
   sources = [ "string_main.cc" ]
+  deps = [ "//base" ]
+}
+
+executable("learn_command_line") {
+  sources = [ "command_line_main.cc" ]
   deps = [ "//base" ]
 }
