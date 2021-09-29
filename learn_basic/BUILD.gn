@@ -4,6 +4,7 @@ group("learn_basic") {
     ":learn_file",
     ":learn_hello",
     ":learn_logging",
+    ":learn_run_loop",
     ":learn_string",
   ]
 }
@@ -29,5 +30,10 @@ executable("learn_logging") {
 
 executable("learn_file") {
   sources = [ "file_main.cc" ]
+  deps = [ "//base" ]
+}
+
+executable("learn_run_loop") {
+  sources = [ "run_loop_main.cc" ]
   deps = [ "//base" ]
 }
