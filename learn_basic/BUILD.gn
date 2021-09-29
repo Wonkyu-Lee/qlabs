@@ -1,6 +1,7 @@
 group("learn_basic") {
   deps = [
     ":learn_command_line",
+    ":learn_file",
     ":learn_hello",
     ":learn_logging",
     ":learn_string",
@@ -23,5 +24,10 @@ executable("learn_command_line") {
 
 executable("learn_logging") {
   sources = [ "logging_main.cc" ]
+  deps = [ "//base" ]
+}
+
+executable("learn_file") {
+  sources = [ "file_main.cc" ]
   deps = [ "//base" ]
 }
