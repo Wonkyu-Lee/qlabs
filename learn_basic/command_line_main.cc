@@ -4,7 +4,7 @@
 #include "base/files/file_path.h"
 #include "base/logging.h"
 
-// ${binary_path} --bool-switch --string-switch=SOME_VALUE
+// learn_command_line --bool-switch --string-switch=SOME_VALUE
 
 int main(int argc, const char* argv[]) {
   CHECK(base::CommandLine::Init(argc, argv))
