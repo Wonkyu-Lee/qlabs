@@ -1,3 +1,11 @@
 group("qlabs") {
-  deps = [ "learn_basic", "learn_mojo" ]
+  deps = [
+    "learn_basic",
+    "learn_mojo",
+  ]
+}
+
+group("tests") {
+  testonly = true
+  deps = [ "learn_tests" ]
 }

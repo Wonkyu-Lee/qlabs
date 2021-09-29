@@ -1,0 +1,19 @@
+import("//testing/test.gni")
+
+group("learn_tests") {
+  testonly = true
+  deps = [ ":sample_api_unittests" ]
+}
+
+test("sample_api_unittests") {
+  testonly = true
+  sources = [
+    "sample_api.cc",
+    "sample_api.h",
+    "sample_api_unittests.cc",
+  ]
+  deps = [
+    "//base/test:run_all_unittests",
+    "//testing/gtest",
+  ]
+}
