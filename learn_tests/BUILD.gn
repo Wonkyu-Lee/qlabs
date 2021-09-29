@@ -5,14 +5,18 @@ group("learn_tests") {
   deps = [ ":sample_api_unittests" ]
 }
 
-test("sample_api_unittests") {
-  testonly = true
+static_library("sample_api") {
   sources = [
     "sample_api.cc",
     "sample_api.h",
-    "sample_api_unittests.cc",
   ]
+}
+
+test("sample_api_unittests") {
+  testonly = true
+  sources = [ "sample_api_unittests.cc" ]
   deps = [
+    ":sample_api",
     "//base/test:run_all_unittests",
     "//testing/gtest",
   ]
