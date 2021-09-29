@@ -1,5 +1,6 @@
 group("learn_basic") {
   deps = [
+    ":learn_callbacks",
     ":learn_command_line",
     ":learn_file",
     ":learn_hello",
@@ -35,5 +36,10 @@ executable("learn_file") {
 
 executable("learn_run_loop") {
   sources = [ "run_loop_main.cc" ]
+  deps = [ "//base" ]
+}
+
+executable("learn_callbacks") {
+  sources = [ "callbacks_main.cc" ]
   deps = [ "//base" ]
 }
