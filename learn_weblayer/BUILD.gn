@@ -1,0 +1,151 @@
+import("//build/config/features.gni")
+import("//build/config/sanitizers/sanitizers.gni")
+import("//build/config/ui.gni")
+import("//build/config/win/console_app.gni")
+import("//build/config/win/manifest.gni")
+import("//tools/grit/grit_rule.gni")
+import("//tools/grit/repack.gni")
+import("//tools/v8_context_snapshot/v8_context_snapshot.gni")
+
+assert(!is_android)
+assert(!win_console_app)
+assert(toolkit_views)
+assert(use_aura)
+
+group("learn_weblayer") {
+  deps = [ ":learn_widgets" ]
+}
+
+config("common_config") {
+  configs = [
+    "//build/config:precompiled_headers",
+    "//build/config/compiler:no_size_t_to_int_warning",
+  ]
+}
+
+static_library("common") {
+  sources = [
+    # toolkit views
+    "//ui/views/test/desktop_test_views_delegate.h",
+    "//ui/views/test/desktop_test_views_delegate_aura.cc",
+    "//ui/views/test/test_views_delegate.h",
+    "//ui/views/test/test_views_delegate_aura.cc",
+  ]
+
+  public_configs = [ ":common_config" ]
+
+  public_deps = [
+    "//base",
+    "//base:base_static",
+    "//base/third_party/dynamic_annotations",
+    "//net",
+    "//net:net_resources",
+    "//sandbox",
+    "//skia",
+    "//third_party/icu",
+    "//ui/base",
+    "//ui/base/clipboard",
+    "//ui/base/ime/init",
+    "//ui/display",
+    "//ui/events:events_base",
+    "//ui/gfx",
+    "//ui/gfx/geometry",
+    "//ui/gfx/ipc",
+    "//ui/gfx/ipc/geometry",
+    "//ui/gfx/ipc/skia",
+    "//ui/gl",
+    "//ui/platform_window",
+    "//url",
+    "//v8",
+    "//weblayer:resources",
+    "//weblayer:weblayer_lib",
+
+    #aura
+    "//ui/aura",
+    "//ui/events",
+    "//ui/strings",
+    "//ui/wm",
+
+    # toolkit views
+    "//ui/native_theme",
+    "//ui/resources",
+    "//ui/views",
+    "//ui/views",
+    "//ui/views/controls/webview",
+    "//ui/wm",
+  ]
+
+  if (is_linux) {
+    public_deps += [
+      "//third_party/fontconfig",
+      "//ui/gfx",
+    ]
+  }
+
+  if (use_x11) {
+    # Some tests rely on this tool at runtime. Note: it might be better if
+    # the tests that needed it had this as a dep instead of adding it here.
+    public_deps += [ "//ui/events/devices/x11" ]
+  }
+
+  if (is_linux) {
+    public_deps += [ "//build/config/freetype" ]
+  }
+}
+
+repack("common_pak") {
+  sources = [
+    "$root_gen_dir/components/components_resources.pak",
+    "$root_gen_dir/components/components_resources_100_percent.pak",
+    "$root_gen_dir/components/strings/components_chromium_strings_en-US.pak",
+    "$root_gen_dir/components/strings/components_locale_settings_en-US.pak",
+    "$root_gen_dir/components/strings/components_strings_en-US.pak",
+    "$root_gen_dir/content/app/resources/content_resources_100_percent.pak",
+    "$root_gen_dir/content/browser/tracing/tracing_resources.pak",
+    "$root_gen_dir/content/content_resources.pak",
+    "$root_gen_dir/content/dev_ui_content_resources.pak",
+    "$root_gen_dir/mojo/public/js/mojo_bindings_resources.pak",
+    "$root_gen_dir/net/net_resources.pak",
+    "$root_gen_dir/third_party/blink/public/resources/blink_resources.pak",
+    "$root_gen_dir/third_party/blink/public/resources/blink_scaled_resources_100_percent.pak",
+    "$root_gen_dir/third_party/blink/public/strings/blink_strings_en-US.pak",
+    "$root_gen_dir/ui/resources/ui_resources_100_percent.pak",
+    "$root_gen_dir/ui/resources/webui_resources.pak",
+    "$root_gen_dir/ui/strings/app_locale_settings_en-US.pak",
+    "$root_gen_dir/ui/strings/ui_strings_en-US.pak",
+    "$root_gen_dir/weblayer/weblayer_resources.pak",
+  ]
+
+  deps = [
+    "//components/resources",
+    "//components/strings",
+    "//content:content_resources",
+    "//content:dev_ui_content_resources",
+    "//content/app/resources",
+    "//content/browser/tracing:resources",
+    "//mojo/public/js:resources",
+    "//net:net_resources",
+    "//third_party/blink/public:resources",
+    "//third_party/blink/public:scaled_resources_100_percent",
+    "//third_party/blink/public/strings",
+    "//ui/resources",
+    "//ui/strings",
+    "//weblayer:resources",
+  ]
+
+  if (toolkit_views) {
+    deps += [ "//ui/views/resources" ]
+    sources +=
+        [ "$root_gen_dir/ui/views/resources/views_resources_100_percent.pak" ]
+  }
+  output = "$root_out_dir/qlabs_common.pak"
+}
+
+executable("learn_widgets") {
+  sources = [ "widgets_main.cc" ]
+
+  deps = [
+    ":common",
+    ":common_pak",
+  ]
+}

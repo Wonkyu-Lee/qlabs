@@ -3,6 +3,7 @@ group("qlabs") {
     "learn_basic",
     "learn_http_server",
     "learn_mojo",
+    "learn_weblayer",
   ]
 }
 
