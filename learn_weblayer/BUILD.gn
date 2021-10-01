@@ -14,6 +14,7 @@ assert(use_aura)
 
 group("learn_weblayer") {
   deps = [
+    ":learn_shaped_webview",
     ":learn_webview",
     ":learn_widgets",
   ]
@@ -155,6 +156,15 @@ executable("learn_widgets") {
 
 executable("learn_webview") {
   sources = [ "webview_main.cc" ]
+
+  deps = [
+    ":common",
+    ":common_pak",
+  ]
+}
+
+executable("learn_shaped_webview") {
+  sources = [ "shaped_webview_main.cc" ]
 
   deps = [
     ":common",
