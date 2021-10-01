@@ -123,12 +123,12 @@ class MainDelegateImpl : public weblayer::MainDelegate {
  private:
   ColoredView* SetUpWidgets() {
     ColoredView* delegate1 = new ColoredView(SK_ColorRED);
-    auto rect1 = gfx::Rect(100, 100, 300, 300);
+    auto rect1 = gfx::Rect(100, 100, 600, 600);
     views::Widget* widget1 = CreateWidget(delegate1, nullptr, rect1);
     widget1->Show();
 
     WebBasedView* delegate2 = new WebBasedView(profile_.get());
-    auto rect2 = gfx::Rect(50, 50, 200, 200);
+    auto rect2 = gfx::Rect(50, 50, 500, 500);
     views::Widget* widget2 = CreateWidget(delegate2, widget1, rect2);
     delegate2->LoadUrl(GURL("https://m.naver.com"));
     widget2->Show();
