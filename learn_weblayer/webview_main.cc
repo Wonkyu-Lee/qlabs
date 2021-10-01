@@ -1,20 +1,31 @@
 #include "base/at_exit.h"
+#include "base/bind.h"
 #include "base/strings/stringprintf.h"
+#include "base/task/post_task.h"
+#include "base/threading/thread_restrictions.h"
+#include "base/time/time.h"
 #include "ui/display/screen.h"
 #include "ui/views/background.h"
+#include "ui/views/controls/webview/webview.h"
+#include "ui/views/layout/fill_layout.h"
 #include "ui/views/test/desktop_test_views_delegate.h"
 #include "ui/views/widget/desktop_aura/desktop_screen.h"
 #include "ui/views/widget/widget.h"
 #include "ui/views/widget/widget_delegate.h"
 #include "ui/wm/core/wm_state.h"
+#include "url/gurl.h"
+#include "weblayer/browser/browser_context_impl.h"
+#include "weblayer/browser/profile_impl.h"
+#include "weblayer/browser/tab_impl.h"
 #include "weblayer/public/main.h"
 #include "weblayer/public/profile.h"
+#include "weblayer/public/tab.h"
 
 namespace {
 
-class MyWidgetDelegateView : public views::WidgetDelegateView {
+class ColoredView : public views::WidgetDelegateView {
  public:
-  explicit MyWidgetDelegateView(SkColor color) {
+  explicit ColoredView(SkColor color) {
     SetBackground(views::CreateSolidBackground(color));
   }
 
@@ -30,6 +41,33 @@ class MyWidgetDelegateView : public views::WidgetDelegateView {
 
  private:
   base::OnceClosure close_callback_;
+  std::unique_ptr<weblayer::Tab> tab_;
+};
+
+class WebBasedView : public views::WidgetDelegateView {
+ public:
+  explicit WebBasedView(weblayer::Profile* profile) : tab_(CreateTab(profile)) {
+    web_view_ = AddChildView(std::make_unique<views::WebView>(nullptr));
+    tab_->AttachToView(web_view_);
+    SetLayoutManager(std::make_unique<views::FillLayout>());
+  }
+
+  void LoadUrl(GURL url) { web_view_->LoadInitialURL(url); }
+
+ private:
+  std::unique_ptr<weblayer::Tab> CreateTab(weblayer::Profile* profile) {
+    auto* profileImpl = static_cast<weblayer::ProfileImpl*>(profile);
+
+    content::WebContents::CreateParams create_params(
+        profileImpl->GetBrowserContext());
+    auto web_contents = content::WebContents::Create(create_params);
+
+    return std::make_unique<weblayer::TabImpl>(profileImpl,
+                                               std::move(web_contents));
+  }
+
+  views::WebView* web_view_;
+  std::unique_ptr<weblayer::Tab> tab_;
 };
 
 views::Widget* CreateWidget(views::WidgetDelegate* delegate,
@@ -83,15 +121,16 @@ class MainDelegateImpl : public weblayer::MainDelegate {
   }
 
  private:
-  MyWidgetDelegateView* SetUpWidgets() {
-    MyWidgetDelegateView* delegate1 = new MyWidgetDelegateView(SK_ColorRED);
-    auto rect1 = gfx::Rect(100, 100, 300, 300);
+  ColoredView* SetUpWidgets() {
+    ColoredView* delegate1 = new ColoredView(SK_ColorRED);
+    auto rect1 = gfx::Rect(100, 100, 600, 600);
     views::Widget* widget1 = CreateWidget(delegate1, nullptr, rect1);
     widget1->Show();
 
-    MyWidgetDelegateView* delegate2 = new MyWidgetDelegateView(SK_ColorYELLOW);
-    auto rect2 = gfx::Rect(50, 50, 200, 200);
+    WebBasedView* delegate2 = new WebBasedView(profile_.get());
+    auto rect2 = gfx::Rect(50, 50, 500, 500);
     views::Widget* widget2 = CreateWidget(delegate2, widget1, rect2);
+    delegate2->LoadUrl(GURL("https://m.naver.com"));
     widget2->Show();
 
     return delegate1;
@@ -101,7 +140,7 @@ class MainDelegateImpl : public weblayer::MainDelegate {
   std::unique_ptr<wm::WMState> wm_state_;
   std::unique_ptr<views::ViewsDelegate> views_delegate_;
   std::unique_ptr<weblayer::Profile> profile_;
-  MyWidgetDelegateView* root_widget_delegate_{nullptr};
+  ColoredView* root_widget_delegate_{nullptr};
 };
 
 weblayer::MainParams CreateMainParams() {
