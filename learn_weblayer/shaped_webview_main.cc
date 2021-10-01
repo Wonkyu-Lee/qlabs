@@ -1,3 +1,4 @@
+#include <math.h>
 #include "base/at_exit.h"
 #include "base/bind.h"
 #include "base/strings/stringprintf.h"
@@ -6,6 +7,10 @@
 #include "base/time/time.h"
 #include "include/core/SkColor.h"
 #include "ui/display/screen.h"
+#include "ui/gfx/animation/animation.h"
+#include "ui/gfx/animation/animation_delegate.h"
+#include "ui/gfx/animation/linear_animation.h"
+#include "ui/gfx/animation/tween.h"
 #include "ui/gfx/scoped_canvas.h"
 #include "ui/views/background.h"
 #include "ui/views/controls/webview/webview.h"
@@ -26,10 +31,14 @@
 
 namespace {
 
-class ColoredView : public views::WidgetDelegateView {
+class ColoredView : public views::WidgetDelegateView,
+                    public gfx::AnimationDelegate {
  public:
   explicit ColoredView(SkColor color) {
-    SetBackground(views::CreateSolidBackground(color));
+    color_animation_ = std::make_unique<gfx::LinearAnimation>(
+        base::TimeDelta::FromSeconds(100), 30, this);
+
+    color_animation_->Start();
   }
 
   void WindowClosing() override {
@@ -43,8 +52,18 @@ class ColoredView : public views::WidgetDelegateView {
   }
 
  private:
+  void AnimationProgressed(const gfx::Animation* animation) override {
+    double value = animation->GetCurrentValue();
+    double rate = sin(value * 100);
+    auto c1 = SkColorSetARGB(0xFF, 0xDE, 0xFF, 0x57);
+    auto c2 = SkColorSetARGB(0xD8, 0x83, 0xFC, 0xFF);
+    auto color = gfx::Tween::ColorValueBetween(rate, c1, c2);
+    SetBackground(views::CreateSolidBackground(color));
+  }
+
   base::OnceClosure close_callback_;
   std::unique_ptr<weblayer::Tab> tab_;
+  std::unique_ptr<gfx::Animation> color_animation_;
 };
 
 class WebBasedView : public views::WidgetDelegateView {
