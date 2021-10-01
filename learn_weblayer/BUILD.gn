@@ -13,7 +13,10 @@ assert(toolkit_views)
 assert(use_aura)
 
 group("learn_weblayer") {
-  deps = [ ":learn_widgets" ]
+  deps = [
+    ":learn_webview",
+    ":learn_widgets",
+  ]
 }
 
 config("common_config") {
@@ -143,6 +146,15 @@ repack("common_pak") {
 
 executable("learn_widgets") {
   sources = [ "widgets_main.cc" ]
+
+  deps = [
+    ":common",
+    ":common_pak",
+  ]
+}
+
+executable("learn_webview") {
+  sources = [ "webview_main.cc" ]
 
   deps = [
     ":common",
