@@ -7,6 +7,7 @@
 #include "base/message_loop/message_pump_type.h"
 #include "base/run_loop.h"
 #include "base/task/single_thread_task_executor.h"
+#include "base/task/thread_pool.h"
 #include "base/task/thread_pool/thread_pool_instance.h"
 #include "base/threading/thread_task_runner_handle.h"
 
@@ -19,23 +20,20 @@ void Async(int n) {
 }
 
 void PostTasks() {
-  base::ThreadTaskRunnerHandle::Get()->PostTask(FROM_HERE,
-                                                base::BindOnce(&Async, 1));
-  base::ThreadTaskRunnerHandle::Get()->PostTask(FROM_HERE,
-                                                base::BindOnce(&Async, 2));
-  base::ThreadTaskRunnerHandle::Get()->PostTask(FROM_HERE,
-                                                base::BindOnce(&Async, 3));
+  auto task_runner = base::ThreadTaskRunnerHandle::Get();
+  task_runner->PostTask(FROM_HERE, base::BindOnce(&Async, 1));
+  task_runner->PostTask(FROM_HERE, base::BindOnce(&Async, 2));
+  task_runner->PostTask(FROM_HERE, base::BindOnce(&Async, 3));
 }
 
 void PostCallbackTwice(base::RepeatingCallback<void(int)> cb) {
-  base::ThreadTaskRunnerHandle::Get()->PostTask(FROM_HERE,
-                                                base::BindOnce(cb, 1));
-  base::ThreadTaskRunnerHandle::Get()->PostTask(
-      FROM_HERE, base::BindOnce(std::move(cb), 1));
+  auto task_runner = base::ThreadTaskRunnerHandle::Get();
+  task_runner->PostTask(FROM_HERE, base::BindOnce(cb, 1));
+  task_runner->PostTask(FROM_HERE, base::BindOnce(std::move(cb), 1));
   LOG(INFO) << (cb.is_null() ? "cb is null" : "cb is not null");
 }
 
-class A : public base::RefCounted<A> {
+class A : public base::RefCountedThreadSafe<A> {
  public:
   int Func1() {
     LOG(INFO) << "Func1";
@@ -47,19 +45,25 @@ class A : public base::RefCounted<A> {
   void Func3() { LOG(INFO) << "Func3"; }
 
  private:
-  friend class base::RefCounted<A>;
+  friend class base::RefCountedThreadSafe<A>;
   ~A() = default;
 };
 
 void PostWithResultCallback() {
   LOG(INFO) << "[PostWithResultCallback]";
   auto a = base::MakeRefCounted<A>();
+
+  // Run callbacks in this thread
   base::ThreadTaskRunnerHandle::Get()->PostTaskAndReplyWithResult(
+      FROM_HERE, base::BindOnce(&A::Func1, a), base::BindOnce(&A::Func2, a));
+
+  // Run Func1 in another thread and Func2 in this thread
+  base::ThreadPool::PostTaskAndReplyWithResult(
       FROM_HERE, base::BindOnce(&A::Func1, a), base::BindOnce(&A::Func2, a));
 }
 
 void PastTaskWithMemberMethod() {
-  LOG(INFO) << "[PastTaskWithMemberMethod]";
+  LOG(INFO) << "[PostTaskWithMemberMethod]";
   auto a = base::MakeRefCounted<A>();
   base::ThreadTaskRunnerHandle::Get()->PostTask(
       FROM_HERE, base::BindOnce(&A::Func3, std::move(a)));
