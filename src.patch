@@ -1,19 +1,20 @@
 diff --git a/.gitignore b/.gitignore
-index 31867d1..9d7eacd 100644
+index ad1b63e2e9d6..cc6b4320d0f9 100644
 --- a/.gitignore
 +++ b/.gitignore
-@@ -329,3 +329,6 @@ vs-chromium-project.txt
+@@ -333,3 +333,6 @@ vs-chromium-project.txt
  
  # Ignore the default results output directory for tools/run-swarmed.py
  /results
 +
 +# Ignore qlabs
-+/qlabs
++qlabs/
+\ No newline at end of file
 diff --git a/BUILD.gn b/BUILD.gn
-index faaf6c5..50e3c89 100644
+index aa2cb7b4583a..b40637f4312e 100644
 --- a/BUILD.gn
 +++ b/BUILD.gn
-@@ -1452,3 +1452,7 @@ _lines = [
+@@ -1490,3 +1490,12 @@ _lines = [
  assert(current_toolchain == default_toolchain)
  
  write_file("$root_build_dir/gn_logs.txt", _lines)
@@ -21,3 +22,20 @@ index faaf6c5..50e3c89 100644
 +group("qlabs_all") {
 +  deps = [ "//qlabs" ]
 +}
++
++group("qlabs_test_all") {
++  testonly = true
++  deps = [ "//qlabs:tests" ]
++}
+diff --git a/net/server/BUILD.gn b/net/server/BUILD.gn
+index 8ee35c5270f8..67ffa3f3f8a3 100644
+--- a/net/server/BUILD.gn
++++ b/net/server/BUILD.gn
+@@ -16,6 +16,7 @@ static_library("http_server") {
+     "//chrome/browser/devtools",
+     "//chrome/test/chromedriver/*",
+     "//content/browser",
++    "//qlabs/*",
+   ]
+ 
+   friend = [
