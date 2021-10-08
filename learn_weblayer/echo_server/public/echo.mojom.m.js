@@ -130,7 +130,6 @@ export class Echo {
    * @return {!EchoRemote}
    */
   static getRemote() {
-    console.log("Echo.getRemote() called!!!");
     let remote = new EchoRemote;
     remote.$.bindNewPipeAndPassReceiver().bindInBrowser();
     return remote;
