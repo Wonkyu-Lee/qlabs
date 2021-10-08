@@ -1,0 +1,21 @@
+executable("echo_server") {
+  sources = [ "echo_server_main.cc" ]
+
+  deps = [
+    ":update_echo_server_res",
+    "//qlabs/learn_http_server:simple_http_server",
+  ]
+}
+
+action("update_echo_server_res") {
+  _src = rebase_path("public")
+  _dst = rebase_path(root_out_dir) + "/echo_server_res/public"
+
+  script = "rm_cp_dir.py"
+  args = [
+    _src,
+    _dst,
+  ]
+
+  outputs = [ "${target_gen_dir}/echo_server_res_copied.txt" ]
+}

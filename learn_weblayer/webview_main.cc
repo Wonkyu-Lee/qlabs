@@ -135,8 +135,10 @@ class MainDelegateImpl : public weblayer::MainDelegate {
     auto rect2 = gfx::Rect(50, 50, 500, 500);
     views::Widget* widget2 = CreateWidget(delegate2, widget1, rect2);
     // delegate2->LoadUrl(GURL("https://m.naver.com"));
-    delegate2->LoadUrl(
-        GURL("file:///home/user/dev/chromium/src/out/debug/echo/echo.html"));
+    auto url = GURL("http://127.0.0.1:3101/qlabs/public/index.html");
+    // auto url =
+    // GURL("file:///home/user/dev/chromium/src/out/debug/echo/echo.html"));
+    delegate2->LoadUrl(url);
     widget2->Show();
 
     return delegate1;

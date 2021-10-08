@@ -161,6 +161,7 @@ executable("learn_webview") {
     ":common",
     ":common_pak",
     "echo:mojo_bindings_js",
+    "echo_server",
   ]
 }
 
