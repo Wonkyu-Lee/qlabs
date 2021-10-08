@@ -160,6 +160,7 @@ executable("learn_webview") {
   deps = [
     ":common",
     ":common_pak",
+    "echo:mojo_bindings_js",
   ]
 }
 

@@ -18,6 +18,7 @@
 #include "weblayer/browser/profile_impl.h"
 #include "weblayer/browser/tab_impl.h"
 #include "weblayer/public/main.h"
+#include "weblayer/public/navigation_controller.h"
 #include "weblayer/public/profile.h"
 #include "weblayer/public/tab.h"
 
@@ -52,7 +53,10 @@ class WebBasedView : public views::WidgetDelegateView {
     SetLayoutManager(std::make_unique<views::FillLayout>());
   }
 
-  void LoadUrl(GURL url) { web_view_->LoadInitialURL(url); }
+  void LoadUrl(GURL url) {
+    tab_->GetNavigationController()->Navigate(url);
+    // web_view_->LoadInitialURL(url);
+  }
 
  private:
   std::unique_ptr<weblayer::Tab> CreateTab(weblayer::Profile* profile) {
@@ -130,7 +134,9 @@ class MainDelegateImpl : public weblayer::MainDelegate {
     WebBasedView* delegate2 = new WebBasedView(profile_.get());
     auto rect2 = gfx::Rect(50, 50, 500, 500);
     views::Widget* widget2 = CreateWidget(delegate2, widget1, rect2);
-    delegate2->LoadUrl(GURL("https://m.naver.com"));
+    // delegate2->LoadUrl(GURL("https://m.naver.com"));
+    delegate2->LoadUrl(
+        GURL("file:///home/user/dev/chromium/src/out/debug/echo/echo.html"));
     widget2->Show();
 
     return delegate1;
