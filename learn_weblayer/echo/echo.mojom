@@ -1,0 +1,6 @@
+module echo.mojom;
+
+// Browser interface.
+interface Echo {
+  Execute(string request) => (string result);
+};

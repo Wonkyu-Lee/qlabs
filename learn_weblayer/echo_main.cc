@@ -1,5 +1,7 @@
 #include "base/at_exit.h"
 #include "base/bind.h"
+#include "base/path_service.h"
+#include "base/process/launch.h"
 #include "base/strings/stringprintf.h"
 #include "base/task/post_task.h"
 #include "base/threading/thread_restrictions.h"
@@ -134,7 +136,7 @@ class MainDelegateImpl : public weblayer::MainDelegate {
     WebBasedView* delegate2 = new WebBasedView(profile_.get());
     auto rect2 = gfx::Rect(50, 50, 500, 500);
     views::Widget* widget2 = CreateWidget(delegate2, widget1, rect2);
-    auto url = GURL("https://m.naver.com");
+    auto url = GURL("http://127.0.0.1:3101/qlabs/public/index.html");
     delegate2->LoadUrl(url);
     widget2->Show();
 
@@ -156,15 +158,29 @@ weblayer::MainParams CreateMainParams() {
   return params;
 }
 
+void LaunchEchoServer() {
+  base::FilePath parent;
+  base::PathService::Get(base::DIR_EXE, &parent);
+  auto path = parent.AppendASCII("echo_server");
+  base::LaunchOptions options;
+  base::CommandLine command_line(path);
+  base::LaunchProcess(command_line, options);
+}
+
 }  // namespace
+
+// Run as follows:
+// out/debug/echo_demo --enable-blink-features=MojoJS
 
 #if defined(OS_WIN)
 int APIENTRY wWinMain(HINSTANCE instance, HINSTANCE, wchar_t*, int) {
+  LaunchEchoServer();
   base::AtExitManager exit_manager;
   return weblayer::Main(CreateMainParams(), instance);
 }
 #else
 int main(int argc, const char** argv) {
+  LaunchEchoServer();
   base::AtExitManager exit_manager;
   return weblayer::Main(CreateMainParams(), argc, argv);
 }

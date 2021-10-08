@@ -39,3 +39,86 @@ index 8ee35c5270f8..67ffa3f3f8a3 100644
    ]
  
    friend = [
+diff --git a/weblayer/BUILD.gn b/weblayer/BUILD.gn
+index 3feb71cc9e39..58895aa0f5ec 100644
+--- a/weblayer/BUILD.gn
++++ b/weblayer/BUILD.gn
+@@ -372,6 +372,10 @@ source_set("weblayer_lib_base") {
+     "renderer/weblayer_render_thread_observer.h",
+     "utility/content_utility_client_impl.cc",
+     "utility/content_utility_client_impl.h",
++
++    # echo
++    "//qlabs/learn_weblayer/echo/echo.cc",
++    "//qlabs/learn_weblayer/echo/echo.h",
+   ]
+ 
+   configs += [
+@@ -540,6 +544,9 @@ source_set("weblayer_lib_base") {
+     "//v8",
+     "//weblayer:resources",
+     "//weblayer/browser/webui:mojo_bindings",
++
++    # echo
++    "//qlabs/learn_weblayer/echo:mojo_bindings",
+   ]
+ 
+   if (enable_captive_portal_detection) {
+@@ -900,7 +907,12 @@ grit("resources") {
+     "grit/weblayer_resources.h",
+     "weblayer_resources.pak",
+   ]
+-  deps = [ "//weblayer/browser/webui:mojo_bindings_webui_js" ]
++  deps = [
++    "//weblayer/browser/webui:mojo_bindings_webui_js",
++
++    # echo
++    "//qlabs/learn_weblayer/echo:mojo_bindings_js",
++  ]
+ }
+ # TODO(jam): move weblayer_shell_resources_grit and copy_shell_resources here in
+ # a way that's shareable?
+diff --git a/weblayer/browser/weblayer_browser_interface_binders.cc b/weblayer/browser/weblayer_browser_interface_binders.cc
+index 6734c8d0c777..c1fcb3eda384 100644
+--- a/weblayer/browser/weblayer_browser_interface_binders.cc
++++ b/weblayer/browser/weblayer_browser_interface_binders.cc
+@@ -24,6 +24,9 @@
+ #include "weblayer/browser/webui/weblayer_internals.mojom.h"
+ #include "weblayer/browser/webui/weblayer_internals_ui.h"
+ 
++#include "qlabs/learn_weblayer/echo/echo.h"
++#include "qlabs/learn_weblayer/echo/echo.mojom.h"
++
+ #if defined(OS_ANDROID)
+ #include "mojo/public/cpp/bindings/self_owned_receiver.h"
+ #include "services/service_manager/public/cpp/interface_provider.h"
+@@ -73,6 +76,20 @@ void BindPageHandler(
+   concrete_controller->BindInterface(std::move(receiver));
+ }
+ 
++void BindEcho(content::RenderFrameHost* host,
++              mojo::PendingReceiver<echo::mojom::Echo> receiver) {
++  static qlabs::EchoImpl echo_impl;
++
++  auto* contents = content::WebContents::FromRenderFrameHost(host);
++  if (!contents)
++    return;
++
++  if (host->GetParent())
++    return;
++
++  echo_impl.BindInterface(std::move(receiver));
++}
++
+ void BindNoStatePrefetchProcessor(
+     content::RenderFrameHost* frame_host,
+     mojo::PendingReceiver<blink::mojom::NoStatePrefetchProcessor> receiver) {
+@@ -120,6 +137,8 @@ void PopulateWebLayerFrameBinders(
+   map->Add<weblayer_internals::mojom::PageHandler>(
+       base::BindRepeating(&BindPageHandler));
+ 
++  map->Add<echo::mojom::Echo>(base::BindRepeating(&BindEcho));
++
+   map->Add<translate::mojom::ContentTranslateDriver>(
+       base::BindRepeating(&BindContentTranslateDriver));
+ 
