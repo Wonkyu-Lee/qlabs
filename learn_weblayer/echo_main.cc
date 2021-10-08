@@ -134,7 +134,7 @@ class MainDelegateImpl : public weblayer::MainDelegate {
     WebBasedView* delegate2 = new WebBasedView(profile_.get());
     auto rect2 = gfx::Rect(50, 50, 500, 500);
     views::Widget* widget2 = CreateWidget(delegate2, widget1, rect2);
-    auto url = GURL("https://m.naver.com");
+    auto url = GURL("http://127.0.0.1:3101/qlabs/public/index.html");
     delegate2->LoadUrl(url);
     widget2->Show();
 

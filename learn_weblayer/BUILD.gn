@@ -14,6 +14,7 @@ assert(use_aura)
 
 group("learn_weblayer") {
   deps = [
+    ":echo_demo",
     ":learn_shaped_webview",
     ":learn_webview",
     ":learn_widgets",
@@ -160,8 +161,6 @@ executable("learn_webview") {
   deps = [
     ":common",
     ":common_pak",
-    "echo:mojo_bindings_js",
-    "echo_server",
   ]
 }
 
@@ -171,5 +170,16 @@ executable("learn_shaped_webview") {
   deps = [
     ":common",
     ":common_pak",
+  ]
+}
+
+executable("echo_demo") {
+  sources = [ "echo_main.cc" ]
+
+  deps = [
+    ":common",
+    ":common_pak",
+    "echo:mojo_bindings_js",
+    "echo_server",
   ]
 }
