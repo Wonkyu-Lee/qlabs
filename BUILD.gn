@@ -3,8 +3,11 @@ group("qlabs") {
     "learn_basic",
     "learn_http_server",
     "learn_mojo",
-    "learn_weblayer",
   ]
+
+  if (!is_mac) {
+    deps += [ "learn_weblayer" ]
+  }
 }
 
 group("tests") {
