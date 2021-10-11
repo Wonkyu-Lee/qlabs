@@ -97,9 +97,20 @@ views::Widget* CreateWidget(views::WidgetDelegate* delegate,
   return widget;
 }
 
+void LaunchEchoServer() {
+  base::FilePath parent;
+  base::PathService::Get(base::DIR_EXE, &parent);
+  auto path = parent.AppendASCII("echo_server");
+  base::LaunchOptions options;
+  base::CommandLine command_line(path);
+  base::LaunchProcess(command_line, options);
+}
+
 class MainDelegateImpl : public weblayer::MainDelegate {
  public:
   void PreMainMessageLoopRun() override {
+    LaunchEchoServer();
+
     wm_state_ = std::make_unique<wm::WMState>();
 
     views_delegate_ = std::make_unique<views::DesktopTestViewsDelegate>();
@@ -158,15 +169,6 @@ weblayer::MainParams CreateMainParams() {
   return params;
 }
 
-void LaunchEchoServer() {
-  base::FilePath parent;
-  base::PathService::Get(base::DIR_EXE, &parent);
-  auto path = parent.AppendASCII("echo_server");
-  base::LaunchOptions options;
-  base::CommandLine command_line(path);
-  base::LaunchProcess(command_line, options);
-}
-
 }  // namespace
 
 // Run as follows:
@@ -174,13 +176,11 @@ void LaunchEchoServer() {
 
 #if defined(OS_WIN)
 int APIENTRY wWinMain(HINSTANCE instance, HINSTANCE, wchar_t*, int) {
-  LaunchEchoServer();
   base::AtExitManager exit_manager;
   return weblayer::Main(CreateMainParams(), instance);
 }
 #else
 int main(int argc, const char** argv) {
-  LaunchEchoServer();
   base::AtExitManager exit_manager;
   return weblayer::Main(CreateMainParams(), argc, argv);
 }
